@@ -186,6 +186,9 @@ declare function clear(): void;
 //   param "maxA" has invalid type: Number|Constant
 //
 // declare function colorMode(mode: number|Constant, max1?: number|Constant, max2?: number|Constant, max3?: number|Constant, maxA?: number|Constant): void;
+declare function colorMode(mode: number, max1?: number, max2?: number, max3?: number, maxA?: number): void;
+declare var HSB: any;
+
 
 /**
  * Sets the color used to fill shapes.
@@ -520,7 +523,9 @@ declare function createGraphics(w: number, h: number, renderer: string): any;
 //   param "mode" has invalid type: String/Constant
 //
 // declare function blendMode(mode: String/Constant): void;
-
+declare function blendMode(mode: any): void;
+declare let BLEND: any;
+declare let ADD: any;
 // src/core/structure.js
 
 /**
