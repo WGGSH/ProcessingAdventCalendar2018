@@ -937,6 +937,7 @@ declare var ptouchX: any;
 declare var ptouchY: any;
 
 // TODO: Property "touches[]", defined in src/events/touch.js, is not a valid JS symbol name
+declare var touches: any[];
 
 /**
  * The boolean system variable touchIsDown is true if the screen is

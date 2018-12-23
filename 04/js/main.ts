@@ -1,43 +1,94 @@
 /// <reference path="p5.global-mode.d.ts" />
 
-let accel: p5.Vector; // 加速度の値を格納する
-let shakedAccel: p5.Vector; // 端末を振ったときの加速度
 
+let pDeviceOrientation: any;
+
+// タッチした情報を格納するクラス
+class touchObject{
+  private touch: object;
+  private id: number;
+  private count: number;
+  constructor(_touch: object) {
+    this.touch = _touch;
+    this.id = _touch.id;
+    this.count = 0;
+  }
+
+  public update(): boolean{
+    this.count++;
+
+    // 削除判定
+    // 同じIDのtouchが存在しなければ削除
+    let isExist: boolean=false;
+    touches.forEach(element => {
+      if (element.id === this.id) {
+        this.touch = element;
+        isExist = true;
+      }
+    });
+
+    this.draw();
+
+
+    return isExist;
+  }
+
+  private draw(): void{
+    noFill();
+    stroke(abs(this.id * 73) % 360, 70, 10);
+    strokeWeight(this.count/2);
+    ellipse(this.touch.x, this.touch.y, this.count*this.count/20, this.count*this.count/20);
+  }
+}
+
+let touchObjectList: touchObject[];
 
 function setup(): void {
-  accel = new p5.Vector();
-  shakedAccel = new p5.Vector();
-  // ジャイロセンサの値を取得する
-  window.addEventListener("devicemotion", function (event): void{
-    accel.x = event.acceleration.x;
-    accel.y = event.acceleration.y;
-    accel.z = event.acceleration.z;
-    if (accel.mag() > 20) {
-      this.console.log(accel);
-      shakedAccel.set(accel);
-    }
-  });
-
   createCanvas(windowWidth, windowHeight);
 
   background(0);
   colorMode(HSB, 360, 100, 100, 100);
+
+  touchObjectList = new Array();
+
+  pDeviceOrientation = deviceOrientation;
 }
 
 function draw(): void {
-  blendMode(BLEND);
-  background(0,5);
-  blendMode(ADD);
-
-  translate(windowWidth / 2, windowHeight / 2);
-  stroke(shakedAccel.z, 85, 10);
-  strokeWeight(3);
-  // ジャイロセンサの値を元せ線の位置を指定する
-  let startPos: p5.Vector = new p5.Vector(0, 0);
-  let endPos: p5.Vector = new p5.Vector(shakedAccel.y / 90 * width, -shakedAccel.x / 90 * height);
-  for (let i: number = 0; i < 25; i++){
-    let startRandVec: p5.Vector = p5.Vector.random2D().mult(random(0, 10));
-    let endRandVec: p5.Vector = p5.Vector.random2D().mult(random(0, 10));
-    line(startPos.x + startRandVec.x, startPos.y + startRandVec.y, endPos.x + endRandVec.x, endPos.y + endRandVec.y);
+  if (pDeviceOrientation !== undefined && pDeviceOrientation !== deviceOrientation) {
+    // 向きが変わったとき
+    noCanvas();
+    createCanvas(window.innerWidth, windowHeight);
   }
+  pDeviceOrientation = deviceOrientation;
+
+  blendMode(BLEND);
+  background(0,10);
+  blendMode(ADD);
+  stroke(255);
+  if (touches.length != 0) {
+
+    // 初出現のIDを探す
+    touches.forEach(element => {
+      console.log(element);
+      let isExist: boolean = false;
+      touchObjectList.forEach(object => {
+        if (element.id === object.id) {
+          isExist = true;
+        }
+      });
+      if (isExist === false) {
+        // 要素の追加
+        touchObjectList.push(new touchObject(element));
+      }
+    });
+  }
+
+
+  touchObjectList.forEach(element => {
+    if (element.update() === false) {
+      touchObjectList.pop(element);
+    }
+  });
+
 }
