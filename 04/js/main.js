@@ -46,7 +46,7 @@ function draw() {
     }
     pDeviceOrientation = deviceOrientation;
     blendMode(BLEND);
-    background(0, 10);
+    background(0, 2);
     blendMode(ADD);
     stroke(255);
     if (touches.length != 0) {
